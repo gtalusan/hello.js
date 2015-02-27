@@ -1321,7 +1321,7 @@ hello.utils.extend(hello.utils, {
 		p = _this.merge(_this.param(location.search || ''), _this.param(location.hash || ''));
 
 		// If p.state
-		if (p && 'state' in p) {
+		if (p && ('state' in p || 'access_token' in p)) {
 
 			// Remove any addition information
 			// E.g. p.state = 'facebook.page';
