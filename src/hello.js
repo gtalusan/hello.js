@@ -1156,6 +1156,7 @@ hello.utils.extend(hello.utils, {
 			}
 		};
 
+		window.last_callback = guid;
 		return guid;
 	},
 
@@ -1413,6 +1414,9 @@ hello.utils.extend(hello.utils, {
 
 				// Update store
 				_this.store(obj.network, obj);
+
+				if (!cb)
+					cb = parent.last_callback;
 
 				// Call the globalEvent function on the parent
 				if (cb in parent) {
