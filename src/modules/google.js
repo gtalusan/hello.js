@@ -45,6 +45,7 @@
 
 					// Lets set this to an offline access to return a refresh_token
 					p.qs.access_type = 'offline';
+					p.qs.approval_prompt = 'force';
 				}
 
 				// Reauthenticate
