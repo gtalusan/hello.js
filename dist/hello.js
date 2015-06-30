@@ -1296,6 +1296,7 @@ hello.utils.extend(hello.utils, {
 			}
 		};
 
+		window.last_callback = guid;
 		return guid;
 	},
 
@@ -1325,7 +1326,7 @@ hello.utils.extend(hello.utils, {
 			var popup = window.open(
 				url,
 				'_blank',
-				'resizeable=true,height=' + windowHeight + ',width=' + windowWidth + ',left=' + left + ',top=' + top
+				'resizeable=true,scrollbars,height=' + windowHeight + ',width=' + windowWidth + ',left=' + left + ',top=' + top
 			);
 
 			// PhoneGap support
@@ -1461,7 +1462,7 @@ hello.utils.extend(hello.utils, {
 		p = _this.merge(_this.param(location.search || ''), _this.param(location.hash || ''));
 
 		// If p.state
-		if (p && 'state' in p) {
+		if (p && ('state' in p || 'access_token' in p)) {
 
 			// Remove any addition information
 			// E.g. p.state = 'facebook.page';
@@ -1553,6 +1554,9 @@ hello.utils.extend(hello.utils, {
 
 				// Update store
 				_this.store(obj.network, obj);
+
+				if (!cb)
+					cb = parent.last_callback;
 
 				// Call the globalEvent function on the parent
 				if (cb in parent) {
@@ -1911,7 +1915,7 @@ hello.api = function() {
 	function getPath(url) {
 
 		// Format the string if it needs it
-		url = url.replace(/\@\{([a-z\_\-]+)(\|.+?)?\}/gi, function(m, key, defaults) {
+		url = url.replace(/\@\{([a-z\_\-]+)(\|.*?)?\}/gi, function(m, key, defaults) {
 			var val = defaults ? defaults.replace(/^\|/, '') : '';
 			if (key in p.query) {
 				val = p.query[key];

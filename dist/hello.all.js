@@ -1296,6 +1296,7 @@ hello.utils.extend(hello.utils, {
 			}
 		};
 
+		window.last_callback = guid;
 		return guid;
 	},
 
@@ -1325,7 +1326,7 @@ hello.utils.extend(hello.utils, {
 			var popup = window.open(
 				url,
 				'_blank',
-				'resizeable=true,height=' + windowHeight + ',width=' + windowWidth + ',left=' + left + ',top=' + top
+				'resizeable=true,scrollbars,height=' + windowHeight + ',width=' + windowWidth + ',left=' + left + ',top=' + top
 			);
 
 			// PhoneGap support
@@ -1461,7 +1462,7 @@ hello.utils.extend(hello.utils, {
 		p = _this.merge(_this.param(location.search || ''), _this.param(location.hash || ''));
 
 		// If p.state
-		if (p && 'state' in p) {
+		if (p && ('state' in p || 'access_token' in p)) {
 
 			// Remove any addition information
 			// E.g. p.state = 'facebook.page';
@@ -1553,6 +1554,9 @@ hello.utils.extend(hello.utils, {
 
 				// Update store
 				_this.store(obj.network, obj);
+
+				if (!cb)
+					cb = parent.last_callback;
 
 				// Call the globalEvent function on the parent
 				if (cb in parent) {
@@ -1911,7 +1915,7 @@ hello.api = function() {
 	function getPath(url) {
 
 		// Format the string if it needs it
-		url = url.replace(/\@\{([a-z\_\-]+)(\|.+?)?\}/gi, function(m, key, defaults) {
+		url = url.replace(/\@\{([a-z\_\-]+)(\|.*?)?\}/gi, function(m, key, defaults) {
 			var val = defaults ? defaults.replace(/^\|/, '') : '';
 			if (key in p.query) {
 				val = p.query[key];
@@ -2858,8 +2862,9 @@ hello.utils.extend(hello.utils, {
 					}
 
 					o.name = o.display_name;
-					o.first_name = o.name.split(' ')[0];
-					o.last_name = o.name.split(' ')[1];
+					var m = o.name.split(' ');
+					o.first_name = m.shift();
+					o.last_name = m.join(' ');
 					o.id = o.uid;
 					delete o.uid;
 					delete o.display_name;
@@ -3201,6 +3206,7 @@ hello.utils.extend(hello.utils, {
 				'me/following': sign('flickr.contacts.getList', {per_page:'@{limit|50}'}),
 				'me/followers': sign('flickr.contacts.getList', {per_page:'@{limit|50}'}),
 				'me/albums': sign('flickr.photosets.getList', {per_page:'@{limit|50}'}),
+				'me/album': sign('flickr.photosets.getPhotos', {photoset_id: '@{id}'}),
 				'me/photos': sign('flickr.people.getPhotos', {per_page:'@{limit|50}'})
 			},
 
@@ -3212,8 +3218,8 @@ hello.utils.extend(hello.utils, {
 						if (o.realname) {
 							o.name = o.realname._content;
 							var m = o.name.split(' ');
-							o.first_name = m[0];
-							o.last_name = m[1];
+							o.first_name = m.shift();
+							o.last_name = m.join(' ');
 						}
 
 						o.thumbnail = getBuddyIcon(o, 'l');
@@ -3632,6 +3638,7 @@ hello.utils.extend(hello.utils, {
 
 					// Lets set this to an offline access to return a refresh_token
 					p.qs.access_type = 'offline';
+					p.qs.approval_prompt = 'force';
 				}
 
 				// Reauthenticate
@@ -3854,8 +3861,10 @@ hello.utils.extend(hello.utils, {
 				}
 
 				if (a.link) {
-					var pic = (a.link.length > 0) ? a.link[0].href + '?access_token=' + token : null;
-					if (pic) {
+
+					var pic = (a.link.length > 0) ? a.link[0].href : null;
+					if (pic && a.link[0].gd$etag) {
+						pic += (pic.indexOf('?') > -1 ? '&' : '?') + 'access_token=' + token;
 						a.picture = pic;
 						a.thumbnail = pic;
 					}
@@ -4712,8 +4721,8 @@ hello.utils.extend(hello.utils, {
 		if (o.id) {
 			if (o.name) {
 				var m = o.name.split(' ');
-				o.first_name = m[0];
-				o.last_name = m[1];
+				o.first_name = m.shift();
+				o.last_name = m.join(' ');
 			}
 
 			// See: https://dev.twitter.com/overview/general/user-profile-images-and-banners
