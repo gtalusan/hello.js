@@ -2,6 +2,7 @@
 
 hello.init({
 	fitbit: {
+		name: 'FitBit',
 		oauth: {
 			version: '1.0',
 			auth: 'https://www.fitbit.com/oauth/authorize',
@@ -9,6 +10,7 @@ hello.init({
 			token: 'https://api.fitbit.com/oauth/access_token'
 		},
 
+		base: 'https://api.fitbit.com/',
 		get: {
 			me: 'profile.json'
 		},

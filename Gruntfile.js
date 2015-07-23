@@ -42,6 +42,7 @@ module.exports = function(grunt) {
 					'src/hello.js',
 					'src/modules/dropbox.js',
 					'src/modules/facebook.js',
+					'src/modules/fitbit.js',
 					'src/modules/flickr.js',
 					'src/modules/foursquare.js',
 					'src/modules/github.js',
