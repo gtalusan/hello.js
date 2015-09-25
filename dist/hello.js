@@ -1433,9 +1433,15 @@ hello.utils.extend(hello.utils, {
 		var _this = this;
 		var p;
 		var location = window.location;
+		var search = location.search;
+
+		if (location.href.indexOf('pinterest') >= 0 && location.href.indexOf('&#34;') >= 0) {
+			search = location.href.replace(/&#34;/g, '%22');
+			search = search.split('?').pop();
+		}
 
 		// Is this an auth relay message which needs to call the proxy?
-		p = _this.param(location.search);
+		p = _this.param(search);
 
 		// OAuth2 or OAuth1 server response?
 		if (p && ((p.code && p.state) || (p.oauth_token && p.proxy_url))) {
@@ -1459,7 +1465,7 @@ hello.utils.extend(hello.utils, {
 		// FACEBOOK is returning auth errors within as a query_string... thats a stickler for consistency.
 		// SoundCloud is the state in the querystring and the token in the hashtag, so we'll mix the two together
 
-		p = _this.merge(_this.param(location.search || ''), _this.param(location.hash || ''));
+		p = _this.merge(_this.param(search || ''), _this.param(location.hash || ''));
 
 		// If p.state
 		if (p && ('state' in p || 'access_token' in p)) {

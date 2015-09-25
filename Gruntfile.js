@@ -49,6 +49,7 @@ module.exports = function(grunt) {
 					'src/modules/google.js',
 					'src/modules/instagram.js',
 					'src/modules/linkedin.js',
+					'src/modules/pinterest.js',
 					'src/modules/soundcloud.js',
 					'src/modules/twitter.js',
 					'src/modules/windows.js',
